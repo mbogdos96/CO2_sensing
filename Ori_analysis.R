@@ -24,11 +24,11 @@ themething_big_labs <- theme(axis.line = element_line(size=1), text = element_te
 
 #dummy data to get fit and predition intervals
 
-CO2_dummy <- data.frame(percet=seq(0,100,by=1))
+CO2_dummy <- data.frame(percet=seq(0,55,by=1))
 interval <- as_tibble(predFit(lr_CO2, newdata = CO2_dummy, interval = "confidence",level = 0.997)) %>%
   mutate(percet = CO2_dummy$percet)
 
-CO2_dummy_pred <- data.frame(percet=seq(0,100,by=1))
+CO2_dummy_pred <- data.frame(percet=seq(0,55,by=1))
 pred.interv <- as_tibble(predFit(lr_CO2, newdata = CO2_dummy_pred, interval = "prediction",level = 0.997)) %>%
   mutate(percet = CO2_dummy_pred$percet)
 
@@ -147,7 +147,7 @@ PhMe2_fig <- ggplot(data = PhMe2_data,mapping = aes(x=CO2_pct,y=RFU)) +
   
 #for figure PPh3
 
-theme_OG_figs <- theme(axis.line = element_line(size=1), panel.background=element_rect(fill="white"), axis.ticks = element_line(size=3), axis.text = element_text(size = 50, face = "bold"), axis.title = element_blank())
+theme_OG_figs <- theme(axis.line = element_line(size=1), panel.background=element_rect(fill="white"), axis.ticks = element_line(size=3), axis.text = element_text(size = 35, face = "bold"), axis.title = element_blank())
 
 CO2_CI_pred_fit_fig <- ggplot(data = CO2_data,mapping = aes(x=percet,y=RFU)) +
   geom_errorbar(aes(ymin=RFU-stdev_RFU,ymax=RFU+stdev_RFU),width=1.25,position = position_dodge(0.05),size=1.25) +
@@ -155,6 +155,16 @@ CO2_CI_pred_fit_fig <- ggplot(data = CO2_data,mapping = aes(x=percet,y=RFU)) +
   geom_ribbon(data = interval, aes(x= percet, ymin=lwr, ymax=upr), alpha = 0.3, inherit.aes = FALSE, fill="blue") + 
   geom_function(fun = ~predict(lr_CO2,data.frame(percet = .x)), size=1) +
   geom_point(size=7) +
+  theme_OG_figs
+
+PPh3_fig <- ggplot(data = CO2_data,mapping = aes(x=percet,y=RFU)) +
+  geom_errorbar(aes(ymin=RFU-stdev_RFU,ymax=RFU+stdev_RFU),width=1.25,position = position_dodge(0.05),size=1.25) +
+  geom_ribbon(data = pred.interv, aes(x=percet,ymin=lwr, ymax=upr), alpha = 0.15, inherit.aes = FALSE, fill = "blue") +
+  geom_ribbon(data = interval, aes(x= percet, ymin=lwr, ymax=upr), alpha = 0.3, inherit.aes = FALSE, fill="blue") + 
+  geom_function(fun = ~predict(lr_CO2,data.frame(percet = .x)), size=1.25) +
+  scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,55)) +
+  scale_y_continuous(breaks = c(30,60,90,120,150),limits = c(0,160)) +
+  geom_point(size=7, colour = "#0F26BB") +
   theme_OG_figs
 
 #for figure PPhMe2
@@ -182,11 +192,11 @@ BODIPY_lr_CO2_eq <- function(BODIPY_data){
   as.character(as.expression(eq));
 }
 
-BODIPY_dummy <- data.frame(Air_pct=seq(0,100,by=1))
+BODIPY_dummy <- data.frame(Air_pct=seq(0,55,by=1))
 BODIPY_interval <- as_tibble(predFit(BODIPY_lr_CO2, newdata = BODIPY_dummy, interval = "confidence",level = 0.95)) %>%
   mutate(Air_pct = BODIPY_dummy$Air_pct)
 
-BODIPY_dummy_pred <- data.frame(Air_pct=seq(0,100,by=1))
+BODIPY_dummy_pred <- data.frame(Air_pct=seq(0,55,by=1))
 BODIPY_pred.interv <- as_tibble(predFit(BODIPY_lr_CO2, newdata = BODIPY_dummy_pred, interval = "prediction",level = 0.95)) %>%
   mutate(Air_pct = BODIPY_dummy_pred$Air_pct)
 
@@ -200,8 +210,10 @@ BODIPY_fig <- ggplot(data = BODIPY_data,mapping = aes(x=Air_pct,y=RFU)) +
 
 BODIPY_pretty_fig <-ggplot(data = BODIPY_data,mapping = aes(x=Air_pct,y=RFU)) +
   geom_errorbar(aes(ymin=RFU-RFU_stdev,ymax=RFU+RFU_stdev),width=1.25,position = position_dodge(0.05), size = 1.25) +
-  geom_ribbon(data = BODIPY_pred.interv, aes(x=Air_pct,ymin=lwr, ymax=upr), alpha = 0.15, inherit.aes = FALSE, fill = "blue") +
-  geom_ribbon(data = BODIPY_interval, aes(x= Air_pct, ymin=lwr, ymax=upr), alpha = 0.3, inherit.aes = FALSE, fill="blue") + 
-  geom_function(fun = ~predict(BODIPY_lr_CO2,data.frame(Air_pct = .x)), size=1) +
-  geom_point(size=7) + 
+  geom_ribbon(data = BODIPY_pred.interv, aes(x=Air_pct,ymin=lwr, ymax=upr), alpha = 0.3, inherit.aes = FALSE, fill = "#057B2C") +
+  geom_ribbon(data = BODIPY_interval, aes(x= Air_pct, ymin=lwr, ymax=upr), alpha = 0.5, inherit.aes = FALSE, fill="#057B2C") + 
+  geom_function(fun = ~predict(BODIPY_lr_CO2,data.frame(Air_pct = .x)), size=1.25) +
+  geom_point(size=7,colour="#01EC50") + 
+  scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,55)) +
+  scale_y_continuous(breaks = c(5000,10000,15000,20000,25000,30000),limits = c(0,30000)) +
   theme_OG_figs
